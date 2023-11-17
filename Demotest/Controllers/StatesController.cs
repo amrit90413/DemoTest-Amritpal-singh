@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,26 +21,27 @@ namespace Demotest.Controllers
             _context = context;
         }
 
-       // GET: States
- public IActionResult Index()
- {
-     try
-     {
-         var data = (from u in _context.States
-                     join c in _context.Countries on u.CountryId equals c.Id
-                     select new countrystateviewmodel()
-                     {
-                         Id = u.Id,
-                         countryName = c.countryName,
-                         StateName = u.StateName
-                     }).ToList();
-         return View(data);
-     }
-     catch (Exception ex)
-     {
-         throw ex;
-     }
- }
+        // GET: States
+        public IActionResult Index()
+        {
+            try
+            {
+                var data = (from u in _context.States
+                            join c in _context.Countries on u.CountryId equals c.Id
+                            select new countrystateviewmodel()
+                            {
+                                Id = u.Id,
+                                countryName = c.countryName,
+                                StateName = u.StateName
+                            }).ToList();
+                return View(data);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
 
         // GET: States/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,7 +49,7 @@ namespace Demotest.Controllers
             try
             {
                 var states = await (from u in _context.States
-                                    join c in _context.Countries on u.Id equals c.Id
+                                    join c in _context.Countries on u.CountryId equals c.Id
                                     select new countrystateviewmodel()
                                     {
                                         Id = u.Id,
@@ -176,30 +177,34 @@ namespace Demotest.Controllers
 
             return View(states);
         }
+        // GET: Countries/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-   // GET: Countries/Delete/5
-   public async Task<IActionResult> Delete(int? id)
-   {
-       if (id == null || _context.States == null)
-       {
-           return NotFound();
-       }
+            var states = await (from u in _context.States
+                                join c in _context.Countries on u.CountryId equals c.Id
+                                select new countrystateviewmodel()
+                                {
+                                    Id = u.Id,
+                                    countryName = c.countryName,
+                                    StateName = u.StateName
+                                }).FirstOrDefaultAsync(m => m.Id == id);
 
-       var states = await (from u in _context.States
-                           join c in _context.Countries on u.Id equals c.Id
-                           select new countrystateviewmodel()
-                           {
-                               Id = u.Id,
-                               countryName = c.countryName,
-                               StateName = u.StateName
-                           }).FirstOrDefaultAsync(m => m.Id == id);
-       if (states == null)
-       {
-           return NotFound();
-       }
+            if (states == null)
+            {
+                return NotFound();
+            }
 
-       return View(states);
-   }
+          
+
+            return View(states);
+        }
+
+        
         // POST: States/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
